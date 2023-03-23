@@ -4,15 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "efa9e57049d2798da11bd8818405a665",
+    "content-hash": "a34558ddd6166eaee3699549c2b5fb66",
     "packages": [
         {
             "name": "thephilosoft/leetcode-php-lib",
             "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Philosoft/leetcode-php-lib.git",
+                "reference": "3ed9173636eb8f575dff7d60da4ba6b648851e7b"
+            },
             "dist": {
-                "type": "path",
-                "url": "../leetcode-php-lib",
-                "reference": "10d5e4730a026842976502ce29679d233c728339"
+                "type": "zip",
+                "url": "https://api.github.com/repos/Philosoft/leetcode-php-lib/zipball/3ed9173636eb8f575dff7d60da4ba6b648851e7b",
+                "reference": "3ed9173636eb8f575dff7d60da4ba6b648851e7b",
+                "shasum": ""
             },
             "require": {
                 "php": "^8.1"
@@ -20,6 +26,7 @@
             "require-dev": {
                 "phpunit/phpunit": "~10.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -39,7 +46,7 @@
                     "./tools/phpstan/vendor/bin/phpstan analyze --xdebug -vvv"
                 ],
                 "fix-style": [
-                    "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix"
+                    "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix -vvv --diff"
                 ]
             },
             "license": [
@@ -52,9 +59,11 @@
                 }
             ],
             "description": "Collection of base classes for LeetCode problems (binary tree, linked list etc)",
-            "transport-options": {
-                "relative": true
-            }
+            "support": {
+                "source": "https://github.com/Philosoft/leetcode-php-lib/tree/master",
+                "issues": "https://github.com/Philosoft/leetcode-php-lib/issues"
+            },
+            "time": "2023-03-23T03:30:40+00:00"
         }
     ],
     "packages-dev": [

@@ -38,8 +38,8 @@
   },
   "repositories": [
     {
-      "type": "path",
-      "url": "../leetcode-php-lib/"
+      "type": "github",
+      "url": "https://github.com/Philosoft/leetcode-php-lib/"
     }
   ]
 }
