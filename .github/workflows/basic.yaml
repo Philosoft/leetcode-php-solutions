@@ -1,0 +1,79 @@
+---
+name: Base workflow
+on:
+  push:
+    branches:
+      - master
+    pull_request:
+
+jobs:
+  basics:
+    name: Basic checks
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Lint annotations
+        uses: korelstar/phplint-problem-matcher@v1 # https://github.com/korelstar/phplint-problem-matcher
+
+      - name: PHP syntax check (via php -l)
+        run: find . -type f -name '*.php' -exec php -l '{}' \;
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2 # https://github.com/shivammathur/setup-php
+        with:
+          php-version: '8.1'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, mysql
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Check vulnerabilities # https://github.com/fabpot/local-php-security-checker
+        run: |
+          curl --silent https://api.github.com/repos/fabpot/local-php-security-checker/releases/latest \
+              | awk '/browser_download_url(.+)linux_amd64/{ printf $2 "\n" }' \
+              | xargs -I{} curl {} --location --silent --output ./local-php-security-checker \
+              && chmod +x ./local-php-security-checker \
+              && ./local-php-security-checker
+
+      - name: Cache Composer packages for phpstan
+        id: composer-cache--phpstan
+        uses: actions/cache@v3
+        with:
+          path: tools/phpstan/vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('tools/phpstan/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install PHPStan
+        run: composer install --no-progress --prefer-dist --working-dir=tools/phpstan
+
+      - name: Static analysis (phpstan)
+        run: tools/phpstan/vendor/bin/phpstan analyze --xdebug -vvv --no-progress
+
+      - name: Cache composer packages for php-cs-fixer
+        id: composer-cache--php-cs-fixer
+        uses: actions/cache@v3
+        with:
+          path: tools/php-cs-fixer/vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('tools/php-cs-fixer/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install php-cs-fixer
+        run: composer install --no-progress --prefer-dist --working-dir=tools/php-cs-fixer
+
+      - name: Check style
+        run: tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --allow-risky=yes --diff --show-progress=no
+
+      - name: run tests
+        run: vendor/bin/phpunit tests
